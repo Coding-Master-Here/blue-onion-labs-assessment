@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./blue_onion_labs
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./blue_onion_labs:/app
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/journal_client_database
+
+  frontend:
+    build: ./journal-entries-client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./journal-entires-client:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+# This entire portion needs to change or be removed
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: journal_client_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
